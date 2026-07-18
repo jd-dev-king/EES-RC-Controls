@@ -1,142 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>RC Circuit Transient Response Simulator</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RC Circuit Transient Response Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="#overview">⚡ RC Circuit Simulator</a>
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <nav class="site-nav">
+        <a href="#overview">Overview</a><a href="#model">Model</a><a href="#application">Application</a>
+        <a href="#results">Results</a><a href="#code">Code</a><a href="#skills">Skills</a><a href="#future">Future</a>
+        <a href="https://github.com/jd-dev-king/RC-Circuit-Transient-Response" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
 
-<header>
+  <main>
+    <section class="hero section" id="overview">
+      <div class="hero-copy">
+        <span class="eyebrow">MATLAB • App Designer • Engineering Simulation</span>
+        <h1>RC Circuit<br>Transient Response Simulator</h1>
+        <h2>Interactive MATLAB App Designer Engineering Simulation</h2>
+        <p>Model and visualize capacitor charging and discharging behavior in a first-order RC circuit. Calculate the time constant, analyze transient response, and export data for engineering analysis.</p>
+        <div class="hero-tools"><span>◢ MATLAB</span><span>▣ App Designer</span><span>↗ Data Visualization</span><span>▤ CSV Export</span></div>
+        <div class="hero-actions"><a class="button primary" href="#application">View Application</a><a class="button secondary" href="#results">View Results</a></div>
+      </div>
+      <div class="hero-media glass-frame"><img src="images/app_interface.png" alt="MATLAB App Designer RC circuit interface"></div>
+    </section>
 
-<h1>⚡ RC Circuit Transient Response Simulator</h1>
+    <section class="feature-grid section compact">
+      <article class="feature-card"><div class="feature-icon blue">◷</div><div><h3>Time Constant</h3><strong>τ = RC</strong><p>The time constant determines how quickly the capacitor charges or discharges.</p></div></article>
+      <article class="feature-card"><div class="feature-icon green">▣</div><div><h3>Charging Response</h3><strong>Exponential Rise</strong><p>Capacitor voltage rises exponentially toward the input voltage.</p></div></article>
+      <article class="feature-card"><div class="feature-icon red">⇄</div><div><h3>Discharging Response</h3><strong>Exponential Decay</strong><p>Capacitor voltage decays exponentially toward zero.</p></div></article>
+      <article class="feature-card"><div class="feature-icon amber">▥</div><div><h3>Data Export</h3><strong>CSV Output</strong><p>Simulation data can be exported for Excel or MATLAB analysis.</p></div></article>
+    </section>
 
-<p>
-MATLAB Engineering Simulation Project
-</p>
+    <section class="dashboard-grid section compact" id="model">
+      <article class="panel"><header>1. RC Circuit Model</header><div class="panel-body image-panel"><img src="images/rc_circuit_diagram.png" alt="RC circuit schematic"><div class="legend-grid"><span>Vin = Input DC Voltage</span><span>Vout = Capacitor Voltage</span><span>R = Resistance (Ω)</span><span>i(t) = Current</span><span>C = Capacitance (F)</span><span>τ = RC Time Constant</span></div></div></article>
+      <article class="panel"><header>2. Mathematical Model</header><div class="panel-body equation-stack"><div><label>Charging:</label><p>V<sub>C</sub>(t) = V<sub>0</sub>(1 − e<sup>−t/RC</sup>)</p></div><div><label class="red-text">Discharging:</label><p>V<sub>C</sub>(t) = V<sub>0</sub>e<sup>−t/RC</sup></p></div><div><label class="green-text">Time Constant:</label><p>τ = RC</p></div><small>At t = τ, the capacitor reaches 63.2% of its final charging voltage.</small></div></article>
+      <article class="panel"><header>3. Simulation Workflow</header><div class="panel-body workflow"><div class="workflow-step blue-box">⌨ <span><strong>User Inputs</strong><small>R, C, V₀, Time</small></span></div><b>↓</b><div class="workflow-step green-box">↻ <span><strong>MATLAB Simulation</strong><small>Apply RC equations</small></span></div><b>↓</b><div class="workflow-step amber-box">ƒx <span><strong>Plot Results</strong><small>Voltage vs. Time</small></span></div><b>↓</b><div class="workflow-step purple-box">▨ <span><strong>Export Data</strong><small>CSV for analysis</small></span></div></div></article>
+      <article class="panel" id="application"><header>4. MATLAB App Interface</header><div class="panel-body image-panel"><img src="images/app_interface.png" alt="MATLAB RC circuit simulator application"><p>Interactive App Designer interface for running simulations and visualizing results.</p></div></article>
+      <article class="panel"><header>5. Simulation Results</header><div class="panel-body checklist"><p>● RC time constant calculated</p><p>● Charging and discharging curves generated</p><p>● 63.2% voltage marker at t = τ</p><p>● Data exported to CSV for analysis</p></div></article>
+    </section>
 
-</header>
+    <section class="results section" id="results">
+      <div class="section-heading"><span>Simulation Output</span><h2>Charging and Discharging Response</h2></div>
+      <div class="result-layout"><div class="result-chart glass-frame"><img src="images/RC_Circuit_Plot.png" alt="RC charging and discharging plot"></div><div class="result-copy"><h3>Engineering Interpretation</h3><p>The charging curve approaches the supply voltage while the discharging curve returns toward zero. The time constant marks the first-order response speed.</p><div class="metric-row"><div><span>63.2%</span><small>Voltage at one τ</small></div><div><span>5τ</span><small>Approx. full response</small></div><div><span>CSV</span><small>Export-ready data</small></div></div></div></div>
+    </section>
 
+    <section class="bottom-grid section compact">
+      <article class="panel code-panel" id="code"><header>6. MATLAB Code Highlights</header><pre><code><span class="line">1</span> tau = R * C;
+<span class="line">2</span> t = 0:dt:t_end;
+<span class="line">3</span>
+<span class="line">4</span> Vc_charge = V0 * (1 - exp(-t / tau));
+<span class="line">5</span> Vc_discharge = V0 * exp(-t / tau);
+<span class="line">6</span> plot(t, Vc_charge, 'b', t, Vc_discharge, 'r--');
+<span class="line">7</span> yline(0.632*V0, 'g--', '63.2% (τ)');</code></pre></article>
+      <article class="panel" id="skills"><header>7. Engineering Skills Demonstrated</header><div class="panel-body skill-tags"><span>MATLAB</span><span>App Designer</span><span>Circuit Analysis</span><span>Engineering Simulation</span><span>Data Visualization</span><span>Mathematical Modeling</span><span>CSV Export</span><span>Technical Documentation</span></div></article>
+      <article class="panel" id="future"><header>8. Future Enhancements</header><div class="panel-body future-list"><p>→ Add interactive sliders for real-time parameter adjustment</p><p>→ Implement frequency response analysis and Bode plots</p><p>→ Develop a Simulink model for system-level simulation</p><p>→ Automate report generation with figures and tables</p><p>→ Support multiple capacitor configurations and topologies</p></div></article>
+    </section>
+  </main>
 
-<section class="hero">
-
-<h2>Project Overview</h2>
-
-<p>
-A MATLAB-based simulation that models capacitor charging and
-discharging behavior in a first-order RC circuit.
-</p>
-
-<p>
-The project demonstrates transient response analysis,
-time constant calculations, and engineering visualization.
-</p>
-
-</section>
-
-
-
-<section>
-
-<h2>Engineering Model</h2>
-
-<div class="card">
-
-<h3>RC Time Constant</h3>
-
-<p>
-τ = RC
-</p>
-
-<h3>Charging Response</h3>
-
-<p>
-V(t)=V₀(1-e<sup>-t/RC</sup>)
-</p>
-
-<h3>Discharging Response</h3>
-
-<p>
-V(t)=V₀e<sup>-t/RC</sup>
-</p>
-
-</div>
-
-</section>
-
-
-
-<section>
-
-<h2>Simulation Results</h2>
-
-<img 
-src="images/RC_Circuit_Plot.png"
-alt="RC Circuit Charging and Discharging Plot">
-
-</section>
-
-
-
-<section>
-
-<h2>Technologies</h2>
-
-<div class="grid">
-
-<div class="card">
-MATLAB
-</div>
-
-<div class="card">
-App Designer
-</div>
-
-<div class="card">
-Circuit Analysis
-</div>
-
-<div class="card">
-Data Visualization
-</div>
-
-</div>
-
-</section>
-
-
-
-<section>
-
-<h2>Project Files</h2>
-
-<p>
-Source code and MATLAB App Designer files are available
-in the GitHub repository.
-</p>
-
-</section>
-
-
-
-<footer>
-
-<p>
-Jeremiah Lupton |
-Engineering Technology Portfolio
-</p>
-
-</footer>
-
-
-<script src="script.js"></script>
+  <footer><div>⚡ RC Circuit Transient Response Simulator</div><div>Jeremiah Lupton | Engineering Technology Portfolio</div><div class="footer-links"><a href="https://github.com/jd-dev-king" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/jdlupton/" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.jeremiahlupton.com">Portfolio</a></div></footer>
+  <button id="topBtn" aria-label="Back to top">↑</button>
+  <script src="script.js"></script>
 
 </body>
 
