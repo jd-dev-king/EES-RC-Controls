@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#07111f" />
+  <title>EES | RC Circuit Digital Twin</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"}}
+  </script>
+</head>
+<body>
+  <div id="app">
+    <section id="connectionBanner" class="connection-banner hidden">
+      <div><span>CONNECTED ASSET</span><strong id="connectedAsset">Standalone RC Circuit</strong><small id="connectedScenario">Manual laboratory test</small></div>
+      <button id="returnTwinBtn">Return to Home Energy Twin</button>
+    </section>
+    <section id="assetGallery" class="asset-gallery hidden">
+      <div class="gallery-heading"><div><span>VISUAL DIAGNOSTIC GALLERY</span><strong id="galleryScope">Selected Assets</strong></div>
+      <label>Monitor Scope<select id="rcMonitorScope"><option>Whole House</option><option>Living Room</option><option>Game Room</option><option>Laundry</option><option>Utility</option><option>Garage</option><option>Kitchen</option></select></label></div>
+      <div id="assetGalleryCards" class="asset-gallery-cards"></div>
+    </section>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">EES</span><div><strong>RC Circuit Digital Twin</strong><small>Electrical Transient Analysis & Condition Monitoring</small></div></div>
+      <div class="top-actions"><span id="systemBadge" class="badge normal">NORMAL</span><button id="helpBtn" class="ghost">Guide</button><button id="fullscreenBtn" class="ghost">Fullscreen</button></div>
+    </header>
+
+    <main class="layout">
+      <section class="asset-context-card panel">
+        <div><small>ACTIVE DIAGNOSTIC ASSET</small><h2 id="contextAsset">Standalone RC Circuit</h2><p id="contextScenario">Manual laboratory test</p></div>
+        <div class="context-metrics"><span>Topology <strong id="contextTopology">Low-Pass RC</strong></span><span>Source <strong id="contextSource">Laboratory</strong></span><span>Auto Test <strong id="autoState">ACTIVE</strong></span></div>
+      </section>
+      <section class="viewport-card">
+        <div id="scene"></div>
+        <div class="scene-overlay">
+          <div><span>Simulation</span><strong id="runState">IDLE</strong></div>
+          <div><span>Mode</span><strong id="modeState">CHARGE</strong></div>
+          <div><span>Elapsed</span><strong id="elapsedValue">0.00 s</strong></div>
+        </div>
+        <div class="scene-controls">
+          <button data-view="iso">Isometric</button><button data-view="circuit">Circuit</button><button data-view="scope">Scope</button><button data-view="lab">Lab</button>
+        </div>
+      </section>
+
+      <aside class="panel telemetry-panel">
+        <div class="panel-heading"><div><small>LIVE TELEMETRY</small><h2>Digital Twin</h2></div><span id="connectionDot" class="pulse-dot"></span></div>
+        <div class="kpi-grid">
+          <article><span>Capacitor Voltage</span><strong id="voltageValue">0.00 V</strong><small id="voltagePct">0.0% charged</small></article>
+          <article><span>Current</span><strong id="currentValue">5.00 mA</strong><small id="currentDirection">charging</small></article>
+          <article><span>Time Constant</span><strong id="tauValue">1.00 s</strong><small>τ = RC</small></article>
+          <article><span>Component Health</span><strong id="healthValue">100%</strong><small id="healthText">Nominal</small></article>
+        </div>
+
+        <div class="meter-block"><div><span>Capacitor Charge</span><strong id="chargePercent">0%</strong></div><div class="meter"><i id="chargeBar"></i></div></div>
+
+        <div class="component-status">
+          <button class="component active" data-component="capacitor"><span class="icon">C</span><span><b>Capacitor</b><small id="capStatus">Healthy</small></span></button>
+          <button class="component" data-component="resistor"><span class="icon">R</span><span><b>Resistor</b><small id="resStatus">Stable</small></span></button>
+          <button class="component" data-component="supply"><span class="icon">V</span><span><b>Power Supply</b><small id="supplyStatus">Regulated</small></span></button>
+        </div>
+      </aside>
+
+      <section class="panel controls-panel">
+        <div class="panel-heading"><div><small>TEST CONFIGURATION</small><h2>Circuit Controls</h2></div><button id="presetBtn" class="mini">Load HVAC Preset</button></div>
+        <div class="controls-grid topology-controls">
+          <label>RC Topology <select id="topology"><option value="lowpass">Low-Pass RC</option><option value="highpass">High-Pass RC</option><option value="series">Series Capacitor Bank</option><option value="parallel">Parallel Capacitor Bank</option><option value="snubber">RC Snubber</option></select></label>
+          <label>Capacitor Configuration <select id="capConfig"><option value="single">Single Capacitor</option><option value="series2">2 Capacitors in Series</option><option value="parallel2">2 Capacitors in Parallel</option><option value="parallel3">3 Capacitors in Parallel</option></select></label>
+          <label>Auto-run Connected Tests <select id="autoRun"><option value="on">Enabled</option><option value="off">Disabled</option></select></label>
+        </div>
+        <div class="controls-grid">
+          <label>Supply Voltage <output id="supplyOut">5.0 V</output><input id="supply" type="range" min="1" max="24" value="5" step="0.1"></label>
+          <label>Resistance <output id="resistanceOut">1.00 kΩ</output><input id="resistance" type="range" min="100" max="10000" value="1000" step="100"></label>
+          <label>Capacitance <output id="capacitanceOut">1000 µF</output><input id="capacitance" type="range" min="100" max="4700" value="1000" step="100"></label>
+          <label>Simulation Speed <output id="speedOut">1×</output><input id="speed" type="range" min="0.25" max="10" value="1" step="0.25"></label>
+        </div>
+        <div class="button-row primary-actions"><button id="startBtn" class="primary">Start</button><button id="pauseBtn">Pause</button><button id="resetBtn">Reset</button><button id="modeBtn">Switch to Discharge</button></div>
+        <div class="button-row"><button id="faultBtn" class="danger">Inject Random Fault</button><button id="clearFaultBtn">Clear Fault</button><button id="reportBtn">Generate Hologram Report</button><button id="quickDownloadBtn">Download Full Report</button></div>
+      </section>
+
+      <section class="panel scope-panel">
+        <div class="panel-heading"><div><small>VIRTUAL INSTRUMENT</small><h2>Oscilloscope</h2></div><div class="legend"><span><i class="v"></i>Voltage</span><span><i class="a"></i>Current</span></div></div>
+        <canvas id="scope" width="900" height="320"></canvas>
+      </section>
+
+      <section class="panel frequency-panel">
+        <div class="panel-heading"><div><small>FREQUENCY RESPONSE</small><h2>Bode Analysis</h2></div><button id="runSweepBtn" class="mini">Run Frequency Sweep</button></div><div class="sweep-status"><span>Live sweep <strong id="sweepProgress">0%</strong></span><span>Current frequency <strong id="sweepFrequency">— Hz</strong></span><div class="meter"><i id="sweepBar"></i></div></div>
+        <div class="bode-grid"><canvas id="bodeMagnitude" width="900" height="260"></canvas><canvas id="bodePhase" width="900" height="260"></canvas></div>
+        <div class="analytics-grid compact-results"><article><span>Cutoff Frequency</span><strong id="cutoffValue">159.15 Hz</strong></article><article><span>Gain at Cutoff</span><strong>-3.01 dB</strong></article><article><span>Phase at Cutoff</span><strong id="phaseCutoff">-45°</strong></article><article><span>Effective Capacitance</span><strong id="effectiveCap">1000 µF</strong></article></div>
+      </section>
+
+
+      <section class="panel power-monitor-panel">
+        <div class="panel-heading"><div><small>REAL-TIME ELECTRICAL MONITORING</small><h2>Power & Breaker Analytics</h2></div><span id="powerMonitorBadge" class="badge normal">MONITORING</span></div>
+        <div class="power-kpi-grid">
+          <article><span>Instantaneous Appliance Draw</span><strong id="instantWatts">0 W</strong><small id="instantAmps">0.00 A at 120 V</small></article>
+          <article><span>RC Control Circuit</span><strong id="controlWatts">0.000 W</strong><small>Board-level consumption</small></article>
+          <article><span>Session Energy</span><strong id="sessionEnergy">0.000 kWh</strong><small id="sessionCost">$0.00 estimated cost</small></article>
+          <article><span>Peak Demand</span><strong id="monitorPeak">0 W</strong><small id="peakTime">No peak captured</small></article>
+        </div>
+        <div class="monitor-grid">
+          <div class="monitor-chart-card"><div class="chart-title"><strong>Live Appliance Power</strong><small>Instantaneous watts and predicted baseline</small></div><canvas id="powerTrend" width="900" height="280"></canvas></div>
+          <div class="monitor-chart-card"><div class="chart-title"><strong>Cost & Peak Projection</strong><small>Historical session cost and demand peak</small></div><canvas id="costTrend" width="900" height="280"></canvas></div>
+        </div>
+      </section>
+
+      <section class="panel breaker-panel">
+        <div class="panel-heading"><div><small>CURRENT CLAMP SENSOR NETWORK</small><h2>Circuit-Level Analysis</h2></div><button id="scanBreakersBtn" class="mini">Scan Clamp Sensors</button></div>
+        <div class="breaker-layout">
+          <div id="breakerList" class="breaker-list"></div>
+          <div class="breaker-detail">
+            <small>SELECTED BREAKER</small><h3 id="breakerName">Connected Appliance Circuit</h3>
+            <div class="breaker-gauge"><i id="breakerGauge"></i></div>
+            <div class="breaker-stats"><span>Current <strong id="breakerCurrent">0.00 A</strong></span><span>Utilization <strong id="breakerUtilization">0%</strong></span><span>Sensor <strong id="clampStatus">Online</strong></span></div>
+            <p id="breakerAdvice">Clamp sensor telemetry is within the expected range.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel integration-panel">
+        <div class="panel-heading"><div><small>LOCAL SMART HOME INTEGRATION</small><h2>Home Assistant Gateway</h2></div><span id="haBadge" class="badge warning">DISCONNECTED</span></div>
+        <div class="integration-grid">
+          <div><label>Gateway Mode<select id="gatewayMode"><option value="local">Local REST / WebSocket</option><option value="mqtt">MQTT over Wi-Fi</option><option value="demo">Demo Local Bridge</option></select></label><label>Entity Prefix<input id="entityPrefix" type="text" value="sensor.ees_rc_twin"></label><div class="button-row"><button id="connectHaBtn" class="primary">Connect Gateway</button><button id="publishHaBtn">Publish Snapshot</button><button id="downloadPayloadBtn">Download JSON Payload</button></div></div>
+          <div class="payload-card"><small>LATEST LOCAL PAYLOAD</small><pre id="haPayload">No payload published.</pre></div>
+        </div>
+      </section>
+
+      <section class="panel planning-panel">
+        <div class="panel-heading"><div><small>ENERGY PLANNING</small><h2>Cost, Solar & Battery Sizing</h2></div><button id="recalculateSizingBtn" class="mini">Recalculate</button></div>
+        <div class="planning-controls"><label>Electric Rate<input id="electricRate" type="number" min="0.01" step="0.01" value="0.18"><span>$/kWh</span></label><label>Daily Runtime<input id="dailyRuntime" type="number" min="0.1" max="24" step="0.1" value="6"><span>hours/day</span></label><label>Backup Duration<input id="backupHours" type="number" min="1" max="72" step="1" value="8"><span>hours</span></label><label>Solar Hours<input id="solarHours" type="number" min="1" max="8" step="0.1" value="4.5"><span>peak sun hours</span></label></div>
+        <div class="analytics-grid planning-results"><article><span>Estimated Monthly Cost</span><strong id="monthlyCost">$0.00</strong></article><article><span>Projected Monthly Energy</span><strong id="monthlyEnergy">0 kWh</strong></article><article><span>Suggested Solar Array</span><strong id="solarSize">0.0 kW</strong></article><article><span>Suggested Battery</span><strong id="batterySize">0.0 kWh</strong></article></div>
+      </section>
+
+      <section class="panel anomaly-panel">
+        <div class="panel-heading"><div><small>CONDITION MONITORING</small><h2>Anomaly Alerts</h2></div><span id="anomalyBadge" class="badge normal">NORMAL</span></div>
+        <div class="anomaly-layout"><div id="anomalyAlerts" class="anomaly-alerts"><article class="normal-alert"><strong>No active anomalies</strong><small>Power behavior matches the expected appliance profile.</small></article></div><div class="anomaly-settings"><label><input id="continuousRunAlert" type="checkbox" checked> Continuous-run detection</label><label><input id="overdrawAlert" type="checkbox" checked> Overdraw detection</label><label><input id="cyclingAlert" type="checkbox" checked> Rapid-cycling detection</label><p>Alerts use the appliance baseline, clamp-sensor demand, runtime, and fault context.</p></div></div>
+      </section>
+
+
+      <section class="panel engineering-docs-panel">
+        <div class="panel-heading"><div><small>ENGINEERING DOCUMENTATION</small><h2>Blueprints, Schematics & Wiring</h2></div><span class="badge normal">LIVE DRAWINGS</span></div>
+        <div class="drawing-controls">
+          <label>Drawing View<select id="drawingView"><option value="blueprint">Panel Blueprint</option><option value="schematic">Control Schematic</option><option value="wiring">Point-to-Point Wiring</option><option value="ladder">Ladder Logic</option></select></label>
+          <label>Control Circuit<select id="controlCircuit"><option value="ac">120 VAC Motor Control</option><option value="dc">24 VDC Motor Control</option><option value="reversing">Reversing Motor Starter</option><option value="vfd">VFD Control Circuit</option></select></label>
+          <button id="downloadDrawingBtn" class="mini">Download Drawing SVG</button>
+        </div>
+        <div class="drawing-layout">
+          <div class="drawing-canvas" id="drawingCanvas"></div>
+          <div class="drawing-notes"><small>DRAWING NOTES</small><h3 id="drawingTitle">Control Panel Blueprint</h3><div id="drawingNotes"></div></div>
+        </div>
+      </section>
+
+      <section class="panel meter-panel">
+        <div class="panel-heading"><div><small>3D TEST INSTRUMENT</small><h2>Digital Multimeter</h2></div><span id="meterModeBadge" class="badge normal">DC VOLTS</span></div>
+        <div class="meter-layout">
+          <div class="meter-readout"><small>MEASURED VALUE</small><strong id="meterReading">0.000 V</strong><span id="meterPoints">TP1 → TP2</span><div class="meter-bar"><i id="meterBar"></i></div></div>
+          <div class="meter-controls"><label>Measurement<select id="meterMode"><option value="dcv">DC Voltage</option><option value="acv">AC Voltage</option><option value="current">Current</option><option value="resistance">Resistance</option><option value="continuity">Continuity</option></select></label><label>Test Points<select id="meterPointsSelect"><option value="supply">Supply L+ / L-</option><option value="capacitor">Across Capacitor</option><option value="resistor">Across Resistor</option><option value="coil">Contactor Coil A1 / A2</option><option value="motor">Motor T1 / T2</option></select></label><button id="holdMeterBtn">Hold Reading</button></div>
+        </div>
+      </section>
+
+      <section class="panel standards-panel">
+        <div class="panel-heading"><div><small>CONTROL PANEL DESIGN REVIEW</small><h2>UL 508A-Informed Checklist</h2></div><span id="codeBadge" class="badge warning">DESIGN REVIEW</span></div>
+        <p class="standards-disclaimer">Educational design-reference checks only. This simulation does not certify a panel, replace the current standard, or substitute for review by a qualified panel builder or authority having jurisdiction.</p>
+        <div class="standards-grid" id="standardsChecklist"></div>
+      </section>
+
+      <section class="panel simulink-panel">
+        <div class="panel-heading"><div><small>SYSTEM-LEVEL MODEL</small><h2>Simulink-Style Signal Model</h2></div><span class="badge normal">LIVE MODEL</span></div>
+        <div class="block-model"><div class="sim-block">Input Source<small id="modelInput">5.0 V Step</small></div><i>→</i><div class="sim-block">Transfer Function<small id="modelTransfer">1 / (RCs + 1)</small></div><i>→</i><div class="sim-block">RC Plant<small id="modelPlant">Low-Pass</small></div><i>→</i><div class="sim-block">Scope & Report<small>Telemetry Output</small></div></div>
+      </section>
+
+      <section class="panel analytics-panel">
+        <div class="panel-heading"><div><small>TEST RESULTS</small><h2>Diagnostics</h2><p id="resultReason" class="result-reason">Transient test and frequency sweep required.</p></div><span id="resultBadge" class="badge warning">INCOMPLETE</span></div>
+        <div class="analytics-grid">
+          <article><span>Calculated τ</span><strong id="calcTau">1.000 s</strong></article>
+          <article><span>Measured τ</span><strong id="measuredTau">—</strong></article>
+          <article><span>Deviation</span><strong id="deviation">—</strong></article>
+          <article><span>Peak Current</span><strong id="peakCurrent">5.00 mA</strong></article>
+          <article><span>Resistor Power</span><strong id="powerValue">25.00 mW</strong></article>
+          <article><span>Temperature</span><strong id="temperature">24.0 °C</strong></article>
+        </div>
+        <div id="assistantMessage" class="assistant-message"><span>AI</span><p>Digital twin initialized. Configure the circuit and start the test.</p></div>
+        <div class="event-log"><div class="log-head"><strong>Event Stream</strong><button id="clearLogBtn" class="mini">Clear</button></div><div id="eventLog"></div></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="guideDialog"><button class="close" data-close>×</button><h2>RC Digital Twin Guide</h2><p>Adjust voltage, resistance, capacitance, and speed. Start a charging or discharging test, then inject faults to compare expected and measured behavior.</p><ul><li>Click the 3D resistor, capacitor, supply, or oscilloscope to inspect it.</li><li>The measured time constant is captured when capacitor voltage crosses 63.2% during charging.</li><li>Generate Report creates a printable engineering test record.</li></ul></dialog>
+  <dialog id="componentDialog"><button class="close" data-close>×</button><small>COMPONENT INSPECTION</small><h2 id="componentTitle">Capacitor</h2><div id="componentDetails"></div></dialog>
+  <dialog id="reportDialog"><button class="close" data-close>×</button><div id="reportContent"></div><div class="button-row"><button id="printReportBtn" class="primary">Print / Save PDF</button><button id="downloadReportBtn">Download Text Report</button></div></dialog>
+
+  <script type="module" src="./scripts/main.js?v=4.0.3"></script>
+</body>
+</html>
