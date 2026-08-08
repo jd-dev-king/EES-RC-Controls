@@ -58,7 +58,10 @@ const integration = (() => {
     temperatureC: Number(item?.temperatureC ?? q.get('temperatureC') ?? 0),
     faultCode: item?.faultCode || q.get('faultCode') || 'none',
     returnUrl: q.get('return') || (source === 'power-grid' ? '../power-grid-sun/' : '../home-twin/'),
-    apiBase: q.get('api') || localStorage.getItem('eesApiBase') || 'http://localhost:8000',
+    apiBase:
+  q.get('api') ||
+  localStorage.getItem('eesApiBase') ||
+  'https://ees-rc-controls-production.up.railway.app',
     batchId,
     batchIndex,
     batchCount: batch?.assets?.length || 0,
