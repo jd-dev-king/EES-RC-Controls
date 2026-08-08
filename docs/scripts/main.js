@@ -533,15 +533,57 @@ const residentialBreakerSeed=[
   {name:'Lighting & Receptacles',profile:monitoringProfiles.lighting}
 ];
 const pharmaEquipmentSeed=[
-  {name:integration.asset||'Pharma Process Twin',profile:monitoringProfiles.pharmaProcess,group:'PROCESS'},
-  {name:'Liquid Batch Mixer',profile:monitoringProfiles.pharmaMixer,group:'PROCESS'},
-  {name:'Transfer Pump',profile:monitoringProfiles.pharmaPump,group:'TRANSFER'},
-  {name:'Intermediate Hold System',profile:monitoringProfiles.pharmaHold,group:'TRANSFER'},
-  {name:'Filling & Packaging Line',profile:monitoringProfiles.pharmaPackaging,group:'PACKAGING'},
-  {name:'CIP System',profile:monitoringProfiles.pharmaCip,group:'UTILITIES'},
-  {name:'Pharma HVAC / Utilities',profile:monitoringProfiles.pharmaUtilities,group:'UTILITIES'}
+  {
+    name:'Liquid Batch Mixer',
+    profile:monitoringProfiles.pharmaMixer,
+    group:'PROCESS'
+  },
+  {
+    name:'Transfer Pump',
+    profile:monitoringProfiles.pharmaPump,
+    group:'TRANSFER'
+  },
+  {
+    name:'Intermediate Hold System',
+    profile:monitoringProfiles.pharmaHold,
+    group:'TRANSFER'
+  },
+  {
+    name:'Filling & Packaging Line',
+    profile:monitoringProfiles.pharmaPackaging,
+    group:'PACKAGING'
+  },
+  {
+    name:'CIP System',
+    profile:monitoringProfiles.pharmaCip,
+    group:'UTILITIES'
+  },
+  {
+    name:'Pharma HVAC / Utilities',
+    profile:monitoringProfiles.pharmaUtilities,
+    group:'UTILITIES'
+  }
 ];
-const breakerSeed=(isIndustrial && (integration.scope||'').toUpperCase()==='PHARMA') ? pharmaEquipmentSeed : residentialBreakerSeed;
+
+const integrationScope = String(
+  integration.scope ||
+  integration.facility ||
+  integration.area ||
+  ''
+).trim().toUpperCase();
+
+const isPharmaIndustrial =
+  isIndustrial &&
+  (
+    integrationScope === 'PHARMA' ||
+    integrationScope.includes('PHARMA') ||
+    String(integration.asset || '').toUpperCase().includes('PHARMA')
+  );
+
+const breakerSeed = isPharmaIndustrial
+  ? pharmaEquipmentSeed
+  : residentialBreakerSeed;
+
 function instantaneousApplianceWatts(){
   const p=monitorProfile(),phase=performance.now()/1000;
   const baseline=p.liveWatts||p.watts;
