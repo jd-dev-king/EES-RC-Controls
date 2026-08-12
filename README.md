@@ -446,3 +446,13 @@ Enterprise Execution Suite / EES Universe
 ## License
 
 This project is provided under the MIT License. See `LICENSE` for details.
+## Universal Data Moon integration (v1.0.1)
+
+RC Controls now forwards operational data to the Universal Data Moon without changing the existing Power Grid Sun → RC Controls integration.
+
+- `POST /api/v1/rc/results` persists the canonical RC diagnostic in PostgreSQL, then forwards a Data Moon diagnostic event and an alert when the result is abnormal.
+- `POST /api/v1/rc/telemetry` forwards the industrial gateway metrics to Data Moon telemetry ingestion and emits an alert when the snapshot is abnormal.
+- Data Moon forwarding is downstream/non-blocking: a Data Moon outage does not prevent RC Controls from retaining its canonical PostgreSQL diagnostic result.
+- The browser never receives the Data Moon ingest secret. `DATA_MOON_INGEST_API_KEY` remains server-side in the RC Controls backend environment.
+
+Required backend environment variables are documented in `backend/.env.example`.
